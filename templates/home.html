@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{%block content%}
+<h1>HOMEPAGE</h1>
+<h1>WELCOME TO GYANSCHOOL !!!!,{% if user.is_authenticated%} {{ user.username }}{% else %}VISITOR {%endif%}!</h1>
+<p>
+    <strong>TOTAL NUMBER OF VISITORS REGISTERED : </strong>{{ count }}
+</p>
+{%endblock%}
