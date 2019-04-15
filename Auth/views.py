@@ -4,6 +4,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from Auth.forms import SignUpForm
+from django.contrib.auth import login, authenticate
+
 
 # Create your views here.
 def home(request):
@@ -14,15 +17,18 @@ def home(request):
 
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = SignUpForm(request.POST)
         if form.is_valid():
             form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
             return redirect('home')
     else:
-        form = UserCreationForm()
-    return render(request,'registration/signup.html',{
-        'form': form
-    })
+        form = SignUpForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
 
 @login_required
 def secret_page(request):
@@ -55,7 +61,7 @@ def settings(request):
 
     can_disconnect = (user.social_auth.count() > 1 or user.has_usable_password())
 
-    return render(request, 'core/settings.html', {
+    return render(request, 'Auth/settings.html', {
         'github_login': github_login,
         'twitter_login': twitter_login,
         'facebook_login': facebook_login,
@@ -80,4 +86,7 @@ def password(request):
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordForm(request.user)
-    return render(request, 'core/password.html', {'form': form})
+    return render(request, 'Auth/password.html', {'form': form})
+
+
+
